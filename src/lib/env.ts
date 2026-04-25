@@ -3,9 +3,21 @@ function read(key: string, fallback = ""): string {
   return value && value.length > 0 ? value : fallback;
 }
 
+function readBool(key: string, fallback = false): boolean {
+  const raw = process.env[key];
+  if (!raw) return fallback;
+  return ["1", "true", "yes", "on"].includes(raw.toLowerCase());
+}
+
 export const env = {
   appUrl: read("NEXT_PUBLIC_APP_URL", "http://localhost:3000"),
   appName: read("NEXT_PUBLIC_APP_NAME", "PrintNest"),
+  demo: {
+    authBypass:
+      readBool("NEXT_PUBLIC_DEMO_AUTH_BYPASS") ||
+      readBool("DEMO_AUTH_BYPASS") ||
+      (process.env.NODE_ENV !== "production" && readBool("DEMO_MODE")),
+  },
   supabase: {
     url: read("NEXT_PUBLIC_SUPABASE_URL"),
     anonKey: read("NEXT_PUBLIC_SUPABASE_ANON_KEY"),
@@ -35,3 +47,4 @@ export const isSupabaseConfigured = Boolean(
 );
 
 export const isOpenAIConfigured = Boolean(env.openai.apiKey);
+export const isDemoAuthBypassEnabled = env.demo.authBypass;

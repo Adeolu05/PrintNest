@@ -1,7 +1,7 @@
 import "server-only";
 
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import { env, isSupabaseConfigured } from "@/lib/env";
+import { env, isDemoAuthBypassEnabled, isSupabaseConfigured } from "@/lib/env";
 
 let serviceClient: SupabaseClient | null = null;
 
@@ -30,6 +30,7 @@ export function getServiceSupabase(): SupabaseClient {
  * missing without crashing the whole app.
  */
 export function hasServerSupabase() {
+  if (isDemoAuthBypassEnabled) return false;
   return Boolean(
     env.supabase.url &&
       env.supabase.anonKey &&
