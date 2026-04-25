@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input, FormField } from "@/components/ui/input";
 import { getBrowserSupabase } from "@/lib/supabase/client";
-import { isSupabaseConfigured } from "@/lib/env";
+import { isDemoAuthBypassEnabled, isSupabaseConfigured } from "@/lib/env";
 
 type Mode = "signup" | "login";
 
@@ -22,6 +22,11 @@ export function AuthForm({ mode }: { mode: Mode }) {
     e.preventDefault();
     setError(null);
     setInfo(null);
+
+    if (isDemoAuthBypassEnabled) {
+      router.push("/dashboard/onboarding");
+      return;
+    }
 
     if (!isSupabaseConfigured) {
       setError(
@@ -111,6 +116,11 @@ export function AuthForm({ mode }: { mode: Mode }) {
       {info ? (
         <p className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950">
           {info}
+        </p>
+      ) : null}
+      {isDemoAuthBypassEnabled ? (
+        <p className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-700 dark:border-blue-900 dark:bg-blue-950">
+          Demo auth mode is enabled. Submit to continue directly to dashboard.
         </p>
       ) : null}
       <Button type="submit" loading={loading} fullWidth size="lg">

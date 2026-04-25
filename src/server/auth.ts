@@ -2,7 +2,7 @@ import "server-only";
 
 import { cookies } from "next/headers";
 import { createClient } from "@supabase/supabase-js";
-import { env } from "@/lib/env";
+import { env, isDemoAuthBypassEnabled } from "@/lib/env";
 import { hasServerSupabase } from "./supabase";
 
 const SESSION_COOKIE = "printnest-access-token";
@@ -21,6 +21,13 @@ export type SessionUser = {
  * for SSR pages and API routes.
  */
 export async function getSessionUser(): Promise<SessionUser | null> {
+  if (isDemoAuthBypassEnabled) {
+    return {
+      id: "local-user",
+      email: "demo@printnest.local",
+      fullName: "Demo Artist",
+    };
+  }
   if (!hasServerSupabase()) return null;
   const store = await cookies();
   const accessToken = store.get(SESSION_COOKIE)?.value;
