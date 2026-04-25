@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { loadStorefront } from "@/server/services/storefront";
 import { StoreFooter } from "@/components/storefront/StoreFooter";
@@ -25,15 +26,15 @@ function StorefrontTopBar({ storeName, storeSlug }: { storeName: string; storeSl
   return (
     <header className="border-b border-zinc-100 bg-white/85 backdrop-blur dark:border-zinc-900 dark:bg-zinc-950/80">
       <div className="mx-auto flex h-12 max-w-5xl items-center justify-between px-4 sm:px-6">
-        <a href={`/s/${storeSlug}`} className="text-sm font-semibold tracking-tight">
+        <Link href={`/s/${storeSlug}`} className="text-sm font-semibold tracking-tight">
           {storeName}
-        </a>
-        <a
+        </Link>
+        <Link
           href="/"
           className="text-xs text-zinc-500 hover:text-zinc-900 dark:hover:text-white"
         >
           Powered by PrintNest
-        </a>
+        </Link>
       </div>
     </header>
   );

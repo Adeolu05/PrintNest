@@ -8,7 +8,7 @@ export default function NotFound() {
         Page not found
       </h1>
       <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-300">
-        The page you tried to load doesn't exist.
+        The page you tried to load doesn&apos;t exist.
       </p>
       <Link href="/" className="mt-6 text-sm font-medium underline">
         Go home

@@ -14,7 +14,7 @@ export default function LoginPage() {
         <AuthForm mode="login" />
       </div>
       <p className="mt-6 text-sm text-zinc-500">
-        Don't have a store yet?{" "}
+        Don&apos;t have a store yet?{" "}
         <Link href="/signup" className="font-medium text-zinc-900 underline-offset-2 hover:underline dark:text-white">
           Create one
         </Link>

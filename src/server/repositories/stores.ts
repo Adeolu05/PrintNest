@@ -1,7 +1,11 @@
 import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { getServiceSupabase, hasServerSupabase } from "@/server/supabase";
+import {
+  getServiceSupabase,
+  hasServerSupabase,
+  isMissingTableError,
+} from "@/server/supabase";
 
 export type StoreRow = {
   id: string;
@@ -41,7 +45,10 @@ export async function getStoreBySlug(slug: string): Promise<StoreRow | null> {
     .eq("store_slug", slug)
     .eq("is_published", true)
     .maybeSingle();
-  if (error) throw error;
+  if (error) {
+    if (isMissingTableError(error)) return null;
+    throw error;
+  }
   return (data as StoreRow) ?? null;
 }
 
@@ -52,7 +59,10 @@ export async function getStoreByUser(userId: string): Promise<StoreRow | null> {
     .select("*")
     .eq("user_id", userId)
     .maybeSingle();
-  if (error) throw error;
+  if (error) {
+    if (isMissingTableError(error)) return null;
+    throw error;
+  }
   return (data as StoreRow) ?? null;
 }
 
@@ -63,7 +73,10 @@ export async function isSlugAvailable(slug: string): Promise<boolean> {
     .select("id")
     .eq("store_slug", slug)
     .maybeSingle();
-  if (error) throw error;
+  if (error) {
+    if (isMissingTableError(error)) return true;
+    throw error;
+  }
   return !data;
 }
 

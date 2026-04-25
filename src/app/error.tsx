@@ -21,7 +21,7 @@ export default function GlobalError({
         We hit a snag rendering this page.
       </h1>
       <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">
-        Try again, or head back home. We've logged the issue.
+        Try again, or head back home. We&apos;ve logged the issue.
       </p>
       <button
         onClick={reset}

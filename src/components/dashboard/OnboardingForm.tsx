@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
@@ -32,33 +32,48 @@ export function OnboardingForm({ defaultName = "" }: Props) {
   const [themeId, setThemeId] = useState<string>(STORE_THEMES[0].id);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [slugStatus, setSlugStatus] = useState<"idle" | "checking" | "available" | "taken">("idle");
   const router = useRouter();
 
   const finalSlug = useMemo(() => slugify(slugTouched ? storeSlug : storeName), [storeName, storeSlug, slugTouched]);
+  const [checkedSlug, setCheckedSlug] = useState<{ slug: string; available: boolean } | null>(null);
+  const lastChecked = useRef<string | null>(null);
+
+  // Derive slug status from input state + the last fetched answer instead of
+  // mutating state inside the effect for the "idle/checking" cases.
+  const derivedSlugStatus: "idle" | "checking" | "available" | "taken" =
+    !finalSlug || finalSlug.length < 2
+      ? "idle"
+      : checkedSlug && checkedSlug.slug === finalSlug
+      ? checkedSlug.available
+        ? "available"
+        : "taken"
+      : "checking";
 
   useEffect(() => {
-    if (!finalSlug || finalSlug.length < 2) {
-      setSlugStatus("idle");
-      return;
-    }
-    setSlugStatus("checking");
+    if (!finalSlug || finalSlug.length < 2) return;
+    if (lastChecked.current === finalSlug) return;
+    let cancelled = false;
     const handle = setTimeout(async () => {
       try {
         const res = await fetch(`/api/stores/check-slug?slug=${encodeURIComponent(finalSlug)}`);
         const data = await res.json();
-        setSlugStatus(data.available ? "available" : "taken");
+        if (cancelled) return;
+        lastChecked.current = finalSlug;
+        setCheckedSlug({ slug: finalSlug, available: Boolean(data.available) });
       } catch {
-        setSlugStatus("idle");
+        // Network errors shouldn't block submit; the server will reject duplicates.
       }
     }, 350);
-    return () => clearTimeout(handle);
+    return () => {
+      cancelled = true;
+      clearTimeout(handle);
+    };
   }, [finalSlug]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
-    if (slugStatus === "taken") {
+    if (derivedSlugStatus === "taken") {
       setError("That store URL is already taken. Try a different one.");
       return;
     }
@@ -109,13 +124,13 @@ export function OnboardingForm({ defaultName = "" }: Props) {
             label="Store URL"
             required
             hint={
-              slugStatus === "checking"
+              derivedSlugStatus === "checking"
                 ? "Checking availability…"
-                : slugStatus === "taken"
+                : derivedSlugStatus === "taken"
                 ? "That URL is taken. Try another."
                 : `Your store will live at /s/${finalSlug || "your-slug"}`
             }
-            error={slugStatus === "taken" ? "Slug is taken" : null}
+            error={derivedSlugStatus === "taken" ? "Slug is taken" : null}
           >
             <Input
               value={slugTouched ? storeSlug : finalSlug}

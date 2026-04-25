@@ -188,7 +188,7 @@ export function ProductDetail({ store, artwork, variants }: Props) {
             </p>
           ) : null}
           <p className="text-xs text-zinc-500">
-            We'll save your order and open WhatsApp so {store.artist_name} can confirm and arrange delivery.
+            We&apos;ll save your order and open WhatsApp so {store.artist_name} can confirm and arrange delivery.
           </p>
         </form>
       </div>

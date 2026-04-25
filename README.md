@@ -69,6 +69,25 @@ supabase/
 
 Schema and RLS migrations live in [supabase/migrations](supabase/migrations). Apply them via the Supabase CLI (`supabase db push`) or paste them into the SQL editor.
 
+You also need a public Storage bucket named `artwork-uploads` (used by `/api/uploads/artwork`). Create it in Supabase → Storage → New bucket → name `artwork-uploads`, public read.
+
+## Deploying to Vercel
+
+1. **Push to GitHub** and import the repo in Vercel. Framework preset is auto-detected (Next.js).
+2. **Set environment variables** in Vercel Project Settings → Environment Variables (Production + Preview):
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY` &nbsp;← must be the **service_role** key, not the anon key
+   - `OPENAI_API_KEY`
+   - `NEXT_PUBLIC_APP_URL` &nbsp;← set to your Vercel URL (e.g. `https://printnest.vercel.app`)
+   - Optional: `OPENAI_MODEL`, `SENTRY_DSN`, `NEXT_PUBLIC_POSTHOG_KEY`, `NEXT_PUBLIC_POSTHOG_HOST`
+3. **Run the migrations** in Supabase (SQL Editor): `supabase/migrations/0001_init.sql` then `0002_rls.sql`.
+4. **Create the `artwork-uploads` Storage bucket** (public).
+5. **Configure Supabase Auth URLs**: in Supabase → Authentication → URL Configuration, add your Vercel URL as the Site URL and add `https://<your-domain>/**` to Redirect URLs.
+6. Push to `main`. Vercel will run `next build` and deploy.
+
+The build has been verified locally (`npm run build`) and produces 35 routes with 0 errors.
+
 ## Roadmap
 
 - Phase 1: Foundation, onboarding, dashboard shell

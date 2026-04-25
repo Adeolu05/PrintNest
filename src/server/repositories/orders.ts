@@ -1,6 +1,10 @@
 import "server-only";
 
-import { getServiceSupabase, hasServerSupabase } from "@/server/supabase";
+import {
+  getServiceSupabase,
+  hasServerSupabase,
+  isMissingTableError,
+} from "@/server/supabase";
 
 export type OrderRow = {
   id: string;
@@ -50,7 +54,10 @@ export async function listOrdersForStore(storeId: string) {
     .select("*")
     .eq("store_id", storeId)
     .order("created_at", { ascending: false });
-  if (error) throw error;
+  if (error) {
+    if (isMissingTableError(error)) return [] as OrderRow[];
+    throw error;
+  }
   return (data ?? []) as OrderRow[];
 }
 

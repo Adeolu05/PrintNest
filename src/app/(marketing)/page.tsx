@@ -155,7 +155,7 @@ function Features() {
   return (
     <section className="border-y border-zinc-100 bg-zinc-50/60 py-16 dark:border-zinc-900 dark:bg-zinc-950/60">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <h2 className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl dark:text-white">What's included</h2>
+        <h2 className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl dark:text-white">What&apos;s included</h2>
         <ul className="mt-6 grid gap-3 sm:grid-cols-2 md:grid-cols-4">
           {items.map((item) => (
             <li key={item} className="rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-700 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-200">
@@ -175,7 +175,7 @@ function DemoGallery() {
         <div>
           <h2 className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl dark:text-white">Demo storefront</h2>
           <p className="mt-1 max-w-2xl text-sm text-zinc-600 dark:text-zinc-300">
-            A live example built with PrintNest's default theme. Browse the artworks, open a product page, or send a sample WhatsApp order.
+            A live example built with PrintNest&apos;s default theme. Browse the artworks, open a product page, or send a sample WhatsApp order.
           </p>
         </div>
         <Link href={`/s/${DEMO_STORE.store_slug}`}>

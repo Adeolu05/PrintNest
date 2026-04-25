@@ -22,7 +22,7 @@ export default async function CheckoutSuccessPage({
             <br />
           </>
         ) : null}
-        We've also opened WhatsApp so the artist can confirm details, take payment, and arrange delivery.
+        We&apos;ve also opened WhatsApp so the artist can confirm details, take payment, and arrange delivery.
       </p>
       <div className="mt-6 flex justify-center gap-3">
         <Link

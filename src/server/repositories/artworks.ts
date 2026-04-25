@@ -1,6 +1,10 @@
 import "server-only";
 
-import { getServiceSupabase, hasServerSupabase } from "@/server/supabase";
+import {
+  getServiceSupabase,
+  hasServerSupabase,
+  isMissingTableError,
+} from "@/server/supabase";
 import { slugify } from "@/lib/utils";
 
 export type ArtworkRow = {
@@ -53,7 +57,10 @@ export async function listArtworksForStore(storeId: string, opts: { onlyPublishe
     .order("created_at", { ascending: false });
   if (opts.onlyPublished) query = query.eq("is_published", true);
   const { data, error } = await query;
-  if (error) throw error;
+  if (error) {
+    if (isMissingTableError(error)) return [] as ArtworkRow[];
+    throw error;
+  }
   return (data ?? []) as ArtworkRow[];
 }
 

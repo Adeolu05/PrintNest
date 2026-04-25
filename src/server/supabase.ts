@@ -36,3 +36,16 @@ export function hasServerSupabase() {
       env.supabase.serviceRoleKey,
   );
 }
+
+/**
+ * Detects PostgREST errors that mean the database schema hasn't been
+ * provisioned yet (e.g. migrations haven't run). These are expected on
+ * a fresh Supabase project and we degrade gracefully rather than 500.
+ */
+export function isMissingTableError(error: unknown): boolean {
+  if (!error || typeof error !== "object") return false;
+  const e = error as { code?: string; message?: string };
+  if (e.code === "PGRST205" || e.code === "42P01") return true;
+  const msg = e.message ?? "";
+  return /Could not find the table|relation .* does not exist/i.test(msg);
+}

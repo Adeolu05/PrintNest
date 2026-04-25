@@ -1,6 +1,10 @@
 import "server-only";
 
-import { getServiceSupabase, hasServerSupabase } from "@/server/supabase";
+import {
+  getServiceSupabase,
+  hasServerSupabase,
+  isMissingTableError,
+} from "@/server/supabase";
 
 export async function recordEvent(input: {
   storeId: string;
@@ -10,7 +14,7 @@ export async function recordEvent(input: {
   metadata?: Record<string, unknown>;
 }) {
   if (!hasServerSupabase()) return;
-  await getServiceSupabase()
+  const { error } = await getServiceSupabase()
     .from("store_analytics_events")
     .insert({
       store_id: input.storeId,
@@ -19,6 +23,9 @@ export async function recordEvent(input: {
       visitor_id: input.visitorId ?? null,
       metadata: input.metadata ?? null,
     });
+  if (error && !isMissingTableError(error)) {
+    console.warn("recordEvent failed", error);
+  }
 }
 
 export async function summariseStore(storeId: string) {
@@ -28,11 +35,15 @@ export async function summariseStore(storeId: string) {
   const supabase = getServiceSupabase();
   const counts = await Promise.all(
     ["store_view", "artwork_view", "checkout_started"].map(async (eventType) => {
-      const { count } = await supabase
+      const { count, error } = await supabase
         .from("store_analytics_events")
         .select("id", { count: "exact", head: true })
         .eq("store_id", storeId)
         .eq("event_type", eventType);
+      if (error) {
+        if (isMissingTableError(error)) return 0;
+        throw error;
+      }
       return count ?? 0;
     }),
   );
