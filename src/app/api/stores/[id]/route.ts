@@ -9,7 +9,11 @@ import {
 } from "@/server/repositories/stores";
 
 async function requireOwnedStore(id: string) {
-  if (!hasServerSupabase()) return { error: "Supabase not configured", status: 503 } as const;
+  if (!hasServerSupabase()) {
+    const local = await getStoreByUser("local-user");
+    if (!local || local.id !== id) return { error: "Not found", status: 404 } as const;
+    return { store: local } as const;
+  }
   const user = await getSessionUser();
   if (!user) return { error: "Not authenticated", status: 401 } as const;
   const store = await getStoreByUser(user.id);

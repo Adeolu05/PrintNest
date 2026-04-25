@@ -11,7 +11,8 @@ export default async function OnboardingPage() {
   const user = await getSessionUser();
   if (!user && hasServerSupabase()) redirect("/login");
 
-  const existing = user ? await getStoreByUser(user.id).catch(() => null) : null;
+  const ownerId = user?.id ?? "local-user";
+  const existing = await getStoreByUser(ownerId).catch(() => null);
   if (existing) {
     redirect("/dashboard");
   }

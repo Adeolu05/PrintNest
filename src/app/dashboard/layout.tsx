@@ -18,7 +18,8 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
-  const store = user ? await getStoreByUser(user.id).catch(() => null) : null;
+  const ownerId = user?.id ?? "local-user";
+  const store = await getStoreByUser(ownerId).catch(() => null);
 
   return (
     <div className="flex min-h-screen bg-zinc-50 dark:bg-zinc-950">

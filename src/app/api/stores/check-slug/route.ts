@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { hasServerSupabase } from "@/server/supabase";
-import { isSlugAvailable } from "@/server/repositories/stores";
+import { getStoreByUser, isSlugAvailable } from "@/server/repositories/stores";
 import { slugify } from "@/lib/utils";
 import { DEMO_STORE } from "@/server/demo";
 
@@ -15,7 +15,9 @@ export async function GET(req: Request) {
     return NextResponse.json({ available: false, reason: "reserved" });
   }
   if (!hasServerSupabase()) {
-    return NextResponse.json({ available: true, slug, reason: "no_db" });
+    const local = await getStoreByUser("local-user");
+    const available = !local || local.store_slug !== slug;
+    return NextResponse.json({ available, slug, reason: "local_mode" });
   }
   const available = await isSlugAvailable(slug);
   return NextResponse.json({ available, slug });

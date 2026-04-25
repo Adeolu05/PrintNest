@@ -11,7 +11,8 @@ export const metadata = { title: "Settings" };
 export default async function SettingsPage() {
   const user = await getSessionUser();
   if (!user && hasServerSupabase()) redirect("/login");
-  const store = user ? await getStoreByUser(user.id).catch(() => null) : null;
+  const ownerId = user?.id ?? "local-user";
+  const store = await getStoreByUser(ownerId).catch(() => null);
   if (!store) redirect("/dashboard/onboarding");
 
   return (
