@@ -81,9 +81,9 @@ export const DEMO_ARTWORKS: ArtworkRow[] = [
       "Soft greys and ochres make this print sit calmly on any wall. It pairs well with reading corners, bedrooms, and minimalist hallways.",
     ai_description: null,
     image_url:
-      "https://images.unsplash.com/photo-1549887534-1541e9326642?w=1600",
+      "https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=1600",
     thumbnail_url:
-      "https://images.unsplash.com/photo-1549887534-1541e9326642?w=600",
+      "https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=600",
     image_width: 3600,
     image_height: 4800,
     category: "Minimalist",

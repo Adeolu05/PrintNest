@@ -23,20 +23,20 @@ export function AuthForm({ mode }: { mode: Mode }) {
     setError(null);
     setInfo(null);
 
-    if (isDemoAuthBypassEnabled) {
-      router.push("/dashboard/onboarding");
+    const goNext = () => {
+      router.push(mode === "signup" ? "/dashboard/onboarding" : "/dashboard");
+    };
+
+    // Demo bypass: when enabled, or when Supabase isn't configured, skip auth
+    // entirely so any details work and the user lands in the dashboard.
+    if (isDemoAuthBypassEnabled || !isSupabaseConfigured) {
+      goNext();
       return;
     }
 
-    if (!isSupabaseConfigured) {
-      setError(
-        "Supabase isn't configured yet. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in .env.local to enable real auth.",
-      );
-      return;
-    }
     const supabase = getBrowserSupabase();
     if (!supabase) {
-      setError("Auth client unavailable. Try refreshing the page.");
+      goNext();
       return;
     }
 
