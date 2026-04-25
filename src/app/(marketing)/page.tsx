@@ -20,14 +20,28 @@ export default function LandingPage() {
 function Hero() {
   return (
     <section className="relative isolate overflow-hidden">
+      {/* Decorative blue glow */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-32 left-1/2 -z-10 h-[480px] w-[860px] -translate-x-1/2 rounded-full bg-gradient-to-br from-blue-300/40 via-indigo-300/30 to-transparent blur-3xl dark:from-blue-500/20 dark:via-indigo-600/15"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -right-24 top-32 -z-10 h-72 w-72 rounded-full bg-blue-400/30 blur-3xl dark:bg-blue-500/20"
+      />
       <div className="mx-auto max-w-6xl px-4 pb-20 pt-16 sm:px-6 sm:pt-24">
         <div className="grid gap-10 lg:grid-cols-[1.05fr_1fr] lg:items-center">
           <div className="space-y-6">
-            <span className="inline-flex items-center rounded-full border border-zinc-200 bg-white px-3 py-1 text-xs font-medium text-zinc-700 shadow-sm dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-200">
+            <span className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 shadow-sm dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-200">
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-blue-500" />
               AI print storefront for visual artists
             </span>
             <h1 className="text-4xl font-semibold leading-[1.05] tracking-tight text-zinc-900 sm:text-5xl md:text-6xl dark:text-white">
-              Turn your artwork into a print store in minutes.
+              Turn your artwork into a{" "}
+              <span className="bg-gradient-to-r from-blue-600 via-indigo-500 to-blue-500 bg-clip-text text-transparent">
+                print store
+              </span>{" "}
+              in minutes.
             </h1>
             <p className="max-w-xl text-base text-zinc-600 sm:text-lg dark:text-zinc-300">
               Upload your art, let AI write the descriptions, and launch a beautiful storefront you can share on Instagram, TikTok, WhatsApp, or anywhere your buyers already are.
@@ -61,25 +75,25 @@ function Hero() {
 
 function HeroPreview() {
   return (
-    <div className="relative grid gap-3 rounded-3xl border border-zinc-200 bg-zinc-50 p-3 shadow-xl shadow-zinc-200/40 dark:border-zinc-800 dark:bg-zinc-900 dark:shadow-none sm:grid-cols-3">
+    <div className="relative grid gap-3 rounded-3xl border border-blue-100 bg-gradient-to-br from-blue-50 via-white to-indigo-50 p-3 shadow-xl shadow-blue-200/50 dark:border-blue-500/20 dark:bg-gradient-to-br dark:from-blue-950/40 dark:via-zinc-950 dark:to-indigo-950/40 dark:shadow-blue-900/20 sm:grid-cols-3">
       <PreviewCard label="1. Upload">
-        <div className="aspect-[4/5] rounded-xl bg-gradient-to-br from-orange-200 via-rose-300 to-amber-200" />
+        <div className="aspect-[4/5] rounded-xl bg-gradient-to-br from-sky-300 via-blue-400 to-indigo-500" />
         <p className="mt-3 text-xs text-zinc-500">Drop your artwork. We optimise the file and check print quality automatically.</p>
       </PreviewCard>
       <PreviewCard label="2. AI writes copy">
         <div className="space-y-2 rounded-xl border border-zinc-200 bg-white p-3 text-xs leading-5 dark:border-zinc-800 dark:bg-zinc-950">
           <p className="font-semibold text-zinc-900 dark:text-zinc-100">Lagos Ember Flow</p>
           <p className="text-zinc-600 dark:text-zinc-300">A bold abstract print inspired by the warmth and movement of Lagos at sunset.</p>
-          <p className="text-[10px] uppercase tracking-wide text-zinc-400">Tone · Premium</p>
+          <p className="text-[10px] font-semibold uppercase tracking-wide text-blue-600 dark:text-blue-300">Tone · Premium</p>
         </div>
         <p className="mt-3 text-xs text-zinc-500">Title, description, captions and SEO — generated and editable.</p>
       </PreviewCard>
       <PreviewCard label="3. Storefront live">
         <div className="rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
-          <div className="aspect-[4/5] rounded-t-xl bg-gradient-to-br from-rose-200 via-orange-200 to-yellow-200" />
+          <div className="aspect-[4/5] rounded-t-xl bg-gradient-to-br from-indigo-400 via-blue-500 to-cyan-400" />
           <div className="space-y-1 px-3 py-3 text-xs">
             <p className="font-semibold text-zinc-900 dark:text-zinc-100">Lagos Ember Flow</p>
-            <p className="text-zinc-500">From ₦18,000</p>
+            <p className="text-blue-600 dark:text-blue-300">From ₦18,000</p>
           </div>
         </div>
         <p className="mt-3 text-xs text-zinc-500">Share one link. Receive structured orders.</p>
@@ -268,10 +282,15 @@ function PlanCard({
     <div
       className={
         featured
-          ? "relative rounded-2xl border border-zinc-900 bg-zinc-900 p-6 text-white shadow-lg dark:border-white"
+          ? "relative overflow-hidden rounded-2xl border border-blue-500/40 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-700 p-6 text-white shadow-xl shadow-blue-600/30"
           : "rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950"
       }
     >
+      {featured ? (
+        <span className="absolute right-4 top-4 inline-flex items-center rounded-full bg-white/15 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white backdrop-blur">
+          Most popular
+        </span>
+      ) : null}
       <p className="text-xs font-semibold uppercase tracking-wider opacity-70">{name}</p>
       <p className="mt-2 text-3xl font-semibold">{price}</p>
       <ul className="mt-4 space-y-2 text-sm opacity-90">
@@ -289,21 +308,32 @@ function PlanCard({
 function FinalCta() {
   return (
     <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-      <div className="overflow-hidden rounded-3xl border border-zinc-200 bg-gradient-to-br from-zinc-900 to-zinc-700 px-8 py-12 text-center text-white shadow-xl dark:border-zinc-800">
-        <h2 className="mx-auto max-w-2xl text-2xl font-semibold leading-tight sm:text-3xl">
+      <div className="relative overflow-hidden rounded-3xl border border-blue-500/30 bg-gradient-to-br from-blue-600 via-indigo-600 to-blue-800 px-8 py-12 text-center text-white shadow-2xl shadow-blue-600/30">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -left-16 -top-20 h-64 w-64 rounded-full bg-white/10 blur-3xl"
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -bottom-24 -right-12 h-72 w-72 rounded-full bg-cyan-400/20 blur-3xl"
+        />
+        <h2 className="relative mx-auto max-w-2xl text-2xl font-semibold leading-tight sm:text-3xl">
           You make the art. PrintNest packages it.
         </h2>
-        <p className="mx-auto mt-2 max-w-xl text-sm text-zinc-200">
+        <p className="relative mx-auto mt-2 max-w-xl text-sm text-blue-100">
           Upload your first artwork. Get a sellable storefront before lunch.
         </p>
-        <div className="mt-6 flex flex-wrap justify-center gap-3">
+        <div className="relative mt-6 flex flex-wrap justify-center gap-3">
           <Link href="/signup">
-            <Button size="lg" variant="secondary">
+            <Button
+              size="lg"
+              className="bg-white text-blue-700 shadow-lg shadow-black/10 hover:bg-blue-50"
+            >
               Create my store
             </Button>
           </Link>
           <Link href="/demo">
-            <Button size="lg" variant="ghost" className="text-white hover:bg-white/10">
+            <Button size="lg" variant="ghost" className="text-white hover:bg-white/10 hover:text-white">
               View demo store
             </Button>
           </Link>

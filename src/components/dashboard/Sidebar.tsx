@@ -18,7 +18,7 @@ export function Sidebar() {
   return (
     <aside className="hidden w-56 shrink-0 border-r border-zinc-100 bg-white px-4 py-6 lg:block dark:border-zinc-900 dark:bg-zinc-950">
       <Link href="/" className="flex items-center gap-2 px-2">
-        <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-zinc-900 text-xs font-bold text-white dark:bg-white dark:text-zinc-900">
+        <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 text-xs font-bold text-white shadow-sm shadow-blue-500/30">
           P
         </span>
         <span className="text-sm font-semibold tracking-tight">PrintNest</span>
@@ -33,8 +33,8 @@ export function Sidebar() {
               className={cn(
                 "flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors",
                 active
-                  ? "bg-zinc-100 font-medium text-zinc-900 dark:bg-zinc-800 dark:text-white"
-                  : "text-zinc-600 hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-900",
+                  ? "bg-blue-50 font-medium text-blue-700 dark:bg-blue-500/15 dark:text-blue-200"
+                  : "text-zinc-600 hover:bg-zinc-50 hover:text-blue-700 dark:text-zinc-300 dark:hover:bg-zinc-900 dark:hover:text-blue-200",
               )}
             >
               <span>{item.label}</span>
@@ -59,7 +59,7 @@ export function MobileTabs() {
             href={item.href}
             className={cn(
               "flex-1 py-3 text-center text-xs font-medium",
-              active ? "text-zinc-900 dark:text-white" : "text-zinc-500",
+              active ? "text-blue-600 dark:text-blue-300" : "text-zinc-500",
             )}
           >
             {item.label}

@@ -13,13 +13,13 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const VARIANTS: Record<Variant, string> = {
   primary:
-    "bg-zinc-900 text-white hover:bg-zinc-800 focus-visible:ring-zinc-900 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200",
+    "bg-blue-600 text-white shadow-sm shadow-blue-600/25 hover:bg-blue-700 focus-visible:ring-blue-500 dark:bg-blue-500 dark:hover:bg-blue-400 dark:shadow-blue-500/30",
   secondary:
-    "bg-zinc-100 text-zinc-900 hover:bg-zinc-200 focus-visible:ring-zinc-300 dark:bg-zinc-800 dark:text-white dark:hover:bg-zinc-700",
+    "bg-blue-50 text-blue-700 hover:bg-blue-100 focus-visible:ring-blue-300 dark:bg-blue-500/15 dark:text-blue-200 dark:hover:bg-blue-500/25",
   ghost:
-    "bg-transparent text-zinc-700 hover:bg-zinc-100 focus-visible:ring-zinc-200 dark:text-zinc-200 dark:hover:bg-zinc-800",
+    "bg-transparent text-zinc-700 hover:bg-blue-50 hover:text-blue-700 focus-visible:ring-blue-200 dark:text-zinc-200 dark:hover:bg-blue-500/10 dark:hover:text-blue-200",
   outline:
-    "border border-zinc-200 bg-white text-zinc-900 hover:border-zinc-300 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:hover:bg-zinc-800",
+    "border border-zinc-200 bg-white text-zinc-900 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 focus-visible:ring-blue-200 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:hover:border-blue-400/50 dark:hover:bg-blue-500/10 dark:hover:text-blue-100",
   danger:
     "bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-500",
 };

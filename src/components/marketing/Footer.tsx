@@ -6,7 +6,7 @@ export function Footer() {
       <div className="mx-auto grid w-full max-w-6xl gap-6 px-4 py-10 text-sm text-zinc-600 sm:px-6 md:grid-cols-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-zinc-900 text-xs font-bold text-white dark:bg-white dark:text-zinc-900">
+            <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 text-xs font-bold text-white shadow-sm shadow-blue-500/30">
               P
             </span>
             <span className="text-sm font-semibold">PrintNest</span>
@@ -58,7 +58,7 @@ function FooterColumn({
       <ul className="mt-3 space-y-2 text-zinc-500">
         {items.map((item) => (
           <li key={item.label}>
-            <Link href={item.href} className="hover:text-zinc-900 dark:hover:text-white">
+            <Link href={item.href} className="hover:text-blue-600 dark:hover:text-blue-300">
               {item.label}
             </Link>
           </li>
