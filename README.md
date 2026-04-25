@@ -1,36 +1,79 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PrintNest
 
-## Getting Started
+PrintNest is an AI print storefront generator for visual artists. Upload artwork, let AI write the product copy, and publish a beautiful, mobile-first print store you can share anywhere. The MVP focuses on:
 
-First, run the development server:
+- Fast onboarding (under 10 minutes from signup to live store)
+- AI-generated titles, descriptions, SEO copy, captions, and price suggestions
+- Public storefront with product detail pages
+- WhatsApp-first checkout with structured order capture
+- Artist dashboard for managing artworks and orders
+
+## Stack
+
+- **App:** Next.js (App Router) + TypeScript
+- **UI:** Tailwind CSS
+- **Data/Auth:** Supabase Postgres + Supabase Auth
+- **AI:** OpenAI API
+- **Storage:** Supabase Storage / Cloudinary (configurable)
+- **Hosting/Ops:** Vercel, Sentry, PostHog
+
+## Getting started
 
 ```bash
+npm install
+cp .env.example .env.local
+# Fill in env values
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Environment variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+See [.env.example](.env.example) for the full list.
 
-## Learn More
+| Variable | Purpose |
+| --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon (browser) key |
+| `SUPABASE_SERVICE_ROLE_KEY` | Service role key (server-only) |
+| `OPENAI_API_KEY` | OpenAI key for AI copy generation |
+| `NEXT_PUBLIC_APP_URL` | Public app URL (e.g. `https://printnest.app`) |
+| `NEXT_PUBLIC_POSTHOG_KEY` | PostHog project key (optional) |
+| `NEXT_PUBLIC_POSTHOG_HOST` | PostHog host (optional) |
+| `SENTRY_DSN` | Sentry DSN (optional) |
 
-To learn more about Next.js, take a look at the following resources:
+## Project structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+src/
+  app/
+    (marketing)/      Landing, demo, pricing, public marketing pages
+    (auth)/           Signup, login, magic link
+    dashboard/        Authenticated artist dashboard
+    s/[storeSlug]/    Public buyer-facing storefront
+    api/              Route handlers (REST API)
+  components/
+    ui/               Reusable design-system primitives
+    dashboard/        Dashboard-specific components
+    storefront/       Public storefront components
+    ai/               AI generation panels
+    upload/           Artwork upload UI
+  lib/                Client-safe utilities, validators
+  server/             Server-only services and repositories
+supabase/
+  migrations/         SQL migrations for schema + RLS
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Database
 
-## Deploy on Vercel
+Schema and RLS migrations live in [supabase/migrations](supabase/migrations). Apply them via the Supabase CLI (`supabase db push`) or paste them into the SQL editor.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Roadmap
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Phase 1: Foundation, onboarding, dashboard shell
+- Phase 2: Artwork management + AI copy
+- Phase 3: WhatsApp checkout + order management
+- Phase 4: Themes, polish, demo data
+- Phase 5: Paystack/Flutterwave/Stripe payments
+- Phase 6: Print-on-demand integrations (Printful, Gelato, Printify)

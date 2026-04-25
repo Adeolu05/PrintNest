@@ -1,7 +1,17 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  images: {
+    remotePatterns: [
+      { protocol: "https", hostname: "images.unsplash.com" },
+      { protocol: "https", hostname: "res.cloudinary.com" },
+      // Allow Supabase storage public URLs across regions/projects.
+      { protocol: "https", hostname: "*.supabase.co" },
+    ],
+  },
+  experimental: {
+    typedRoutes: false,
+  },
 };
 
 export default nextConfig;
