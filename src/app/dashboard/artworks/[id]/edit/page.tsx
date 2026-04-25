@@ -17,13 +17,14 @@ export default async function EditArtworkPage({
   const user = await getSessionUser();
   if (!user && hasServerSupabase()) redirect("/login");
 
-  const store = user ? await getStoreByUser(user.id).catch(() => null) : null;
+  const ownerId = user?.id ?? "local-user";
+  const store = await getStoreByUser(ownerId).catch(() => null);
   if (!store) redirect("/dashboard/onboarding");
 
-  const artwork = await getArtworkById(id);
+  const artwork = await getArtworkById(id).catch(() => null);
   if (!artwork || artwork.store_id !== store.id) notFound();
 
-  const variants = await listVariantsForArtwork(artwork.id);
+  const variants = await listVariantsForArtwork(artwork.id).catch(() => []);
 
   return (
     <div>

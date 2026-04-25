@@ -150,8 +150,25 @@ export function ArtworkForm({ storeCurrency, initial }: Props) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Could not save artwork");
+
+      // Some failure modes (uncaught exceptions in serverless functions on
+      // Vercel, edge proxies, etc.) come back without a JSON body. Read as
+      // text first and parse defensively so the user sees a useful error
+      // instead of `Unexpected end of JSON input`.
+      const raw = await res.text();
+      let data: { error?: string; artwork?: unknown } = {};
+      if (raw) {
+        try {
+          data = JSON.parse(raw) as typeof data;
+        } catch {
+          data = { error: raw.slice(0, 200) };
+        }
+      }
+      if (!res.ok) {
+        throw new Error(
+          data.error ?? `Could not save artwork (HTTP ${res.status})`,
+        );
+      }
       router.push("/dashboard/artworks");
       router.refresh();
     } catch (e: unknown) {

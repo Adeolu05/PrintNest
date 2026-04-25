@@ -31,66 +31,87 @@ const incomingSchema = artworkSchema.extend({
 });
 
 export async function GET() {
-  if (!hasServerSupabase()) return NextResponse.json({ artworks: [] });
-  const user = await getSessionUser();
-  if (!user) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-  const store = await getStoreByUser(user.id);
-  if (!store) return NextResponse.json({ artworks: [] });
-  const artworks = await listArtworksForStore(store.id);
-  return NextResponse.json({ artworks });
+  try {
+    const user = await getSessionUser();
+    if (!user && hasServerSupabase()) {
+      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+    }
+    const ownerId = user?.id ?? "local-user";
+    const store = await getStoreByUser(ownerId).catch(() => null);
+    if (!store) return NextResponse.json({ artworks: [] });
+    const artworks = await listArtworksForStore(store.id).catch(() => []);
+    return NextResponse.json({ artworks });
+  } catch (err) {
+    console.error("[GET /api/artworks] failed", err);
+    return NextResponse.json({ artworks: [] });
+  }
 }
 
 export async function POST(req: Request) {
-  if (!hasServerSupabase()) {
-    return NextResponse.json({ error: "Supabase not configured" }, { status: 503 });
+  try {
+    const user = await getSessionUser();
+    if (!user && hasServerSupabase()) {
+      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+    }
+    const ownerId = user?.id ?? "local-user";
+    const store = await getStoreByUser(ownerId).catch(() => null);
+    if (!store) {
+      return NextResponse.json(
+        { error: "Set up your store before uploading artworks." },
+        { status: 404 },
+      );
+    }
+
+    const body = await req.json().catch(() => null);
+    const parsed = incomingSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Invalid input", issues: parsed.error.flatten() },
+        { status: 400 },
+      );
+    }
+
+    const artwork = await createArtwork({
+      store_id: store.id,
+      title: parsed.data.title,
+      slug: parsed.data.slug,
+      short_description: parsed.data.shortDescription || null,
+      description: parsed.data.description || null,
+      ai_description: parsed.data.aiCaption || null,
+      image_url: parsed.data.imageUrl,
+      thumbnail_url: parsed.data.thumbnailUrl || null,
+      image_width: parsed.data.imageWidth ?? null,
+      image_height: parsed.data.imageHeight ?? null,
+      category: parsed.data.category || null,
+      medium: parsed.data.medium || null,
+      year_created: parsed.data.yearCreated ?? null,
+      tags: parsed.data.tags ?? [],
+      base_price: parsed.data.basePrice,
+      currency: parsed.data.currency,
+      is_limited_edition: parsed.data.isLimitedEdition ?? false,
+      edition_size: parsed.data.editionSize ?? null,
+      is_published: parsed.data.isPublished ?? false,
+    });
+
+    if (parsed.data.variants?.length) {
+      await replaceVariants(
+        artwork.id,
+        parsed.data.variants.map((v) => ({
+          size_code: v.sizeCode,
+          frame_option: v.frameOption,
+          price: v.price,
+          stock_quantity: v.stockQuantity ?? null,
+        })),
+      ).catch((err) => {
+        console.warn("[POST /api/artworks] failed to save variants", err);
+      });
+    }
+
+    return NextResponse.json({ artwork }, { status: 201 });
+  } catch (err) {
+    console.error("[POST /api/artworks] failed", err);
+    const message =
+      err instanceof Error ? err.message : "Could not save artwork";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
-  const user = await getSessionUser();
-  if (!user) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-  const store = await getStoreByUser(user.id);
-  if (!store) return NextResponse.json({ error: "Store not found" }, { status: 404 });
-
-  const body = await req.json().catch(() => null);
-  const parsed = incomingSchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json(
-      { error: "Invalid input", issues: parsed.error.flatten() },
-      { status: 400 },
-    );
-  }
-
-  const artwork = await createArtwork({
-    store_id: store.id,
-    title: parsed.data.title,
-    slug: parsed.data.slug,
-    short_description: parsed.data.shortDescription || null,
-    description: parsed.data.description || null,
-    ai_description: parsed.data.aiCaption || null,
-    image_url: parsed.data.imageUrl,
-    thumbnail_url: parsed.data.thumbnailUrl || null,
-    image_width: parsed.data.imageWidth ?? null,
-    image_height: parsed.data.imageHeight ?? null,
-    category: parsed.data.category || null,
-    medium: parsed.data.medium || null,
-    year_created: parsed.data.yearCreated ?? null,
-    tags: parsed.data.tags ?? [],
-    base_price: parsed.data.basePrice,
-    currency: parsed.data.currency,
-    is_limited_edition: parsed.data.isLimitedEdition ?? false,
-    edition_size: parsed.data.editionSize ?? null,
-    is_published: parsed.data.isPublished ?? false,
-  });
-
-  if (parsed.data.variants?.length) {
-    await replaceVariants(
-      artwork.id,
-      parsed.data.variants.map((v) => ({
-        size_code: v.sizeCode,
-        frame_option: v.frameOption,
-        price: v.price,
-        stock_quantity: v.stockQuantity ?? null,
-      })),
-    );
-  }
-
-  return NextResponse.json({ artwork }, { status: 201 });
 }
