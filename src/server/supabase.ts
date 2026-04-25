@@ -50,3 +50,33 @@ export function isMissingTableError(error: unknown): boolean {
   const msg = e.message ?? "";
   return /Could not find the table|relation .* does not exist/i.test(msg);
 }
+
+/**
+ * Detects PostgREST/Postgres errors that mean the live schema doesn't
+ * match what the app expects. This covers both missing tables and
+ * missing columns / stale schema cache (PGRST204), so we can transparently
+ * fall back to the in-memory / cookie-backed local store instead of
+ * crashing with a 500.
+ *
+ * Codes covered:
+ * - PGRST204: "Could not find the 'X' column of 'Y' in the schema cache"
+ * - PGRST205: "Could not find the table 'X' in the schema cache"
+ * - 42P01:   undefined_table
+ * - 42703:   undefined_column
+ */
+export function isSchemaError(error: unknown): boolean {
+  if (!error || typeof error !== "object") return false;
+  const e = error as { code?: string; message?: string };
+  if (
+    e.code === "PGRST204" ||
+    e.code === "PGRST205" ||
+    e.code === "42P01" ||
+    e.code === "42703"
+  ) {
+    return true;
+  }
+  const msg = e.message ?? "";
+  return /Could not find the (table|'.+' column)|relation .* does not exist|column .* does not exist|schema cache/i.test(
+    msg,
+  );
+}

@@ -6,6 +6,7 @@ import {
   getServiceSupabase,
   hasServerSupabase,
   isMissingTableError,
+  isSchemaError,
 } from "@/server/supabase";
 
 export type StoreRow = {
@@ -92,12 +93,48 @@ function makeLocalStore(input: CreateStoreInput): StoreRow {
   };
 }
 
-export async function getStoreBySlug(slug: string): Promise<StoreRow | null> {
-  if (!hasServerSupabase()) {
-    const local = await readLocalStore();
-    if (!local || !local.is_published) return null;
-    return local.store_slug === slug ? local : null;
+async function getLocalStoreBySlug(slug: string): Promise<StoreRow | null> {
+  const local = await readLocalStore();
+  if (!local || !local.is_published) return null;
+  return local.store_slug === slug ? local : null;
+}
+
+async function getLocalStoreByUser(userId: string): Promise<StoreRow | null> {
+  const local = await readLocalStore();
+  if (!local) return null;
+  return local.user_id === userId || userId === "local-user" ? local : null;
+}
+
+async function isLocalSlugAvailable(slug: string): Promise<boolean> {
+  const local = await readLocalStore();
+  return !local || local.store_slug !== slug;
+}
+
+async function createLocalStore(input: CreateStoreInput): Promise<StoreRow> {
+  const local = makeLocalStore(input);
+  await writeLocalStore(local);
+  return local;
+}
+
+async function updateLocalStore(
+  id: string,
+  patch: Partial<StoreRow>,
+): Promise<StoreRow> {
+  const current = await readLocalStore();
+  if (!current || current.id !== id) {
+    throw new Error("Store not found");
   }
+  const updated: StoreRow = {
+    ...current,
+    ...patch,
+    updated_at: new Date().toISOString(),
+  };
+  await writeLocalStore(updated);
+  return updated;
+}
+
+export async function getStoreBySlug(slug: string): Promise<StoreRow | null> {
+  if (!hasServerSupabase()) return getLocalStoreBySlug(slug);
   const { data, error } = await client()
     .from("stores")
     .select("*")
@@ -106,34 +143,29 @@ export async function getStoreBySlug(slug: string): Promise<StoreRow | null> {
     .maybeSingle();
   if (error) {
     if (isMissingTableError(error)) return null;
+    if (isSchemaError(error)) return getLocalStoreBySlug(slug);
     throw error;
   }
   return (data as StoreRow) ?? null;
 }
 
 export async function getStoreByUser(userId: string): Promise<StoreRow | null> {
-  if (!hasServerSupabase()) {
-    const local = await readLocalStore();
-    if (!local) return null;
-    return local.user_id === userId || userId === "local-user" ? local : null;
-  }
+  if (!hasServerSupabase()) return getLocalStoreByUser(userId);
   const { data, error } = await client()
     .from("stores")
     .select("*")
     .eq("user_id", userId)
     .maybeSingle();
   if (error) {
-    if (isMissingTableError(error)) return null;
+    if (isMissingTableError(error)) return getLocalStoreByUser(userId);
+    if (isSchemaError(error)) return getLocalStoreByUser(userId);
     throw error;
   }
   return (data as StoreRow) ?? null;
 }
 
 export async function isSlugAvailable(slug: string): Promise<boolean> {
-  if (!hasServerSupabase()) {
-    const local = await readLocalStore();
-    return !local || local.store_slug !== slug;
-  }
+  if (!hasServerSupabase()) return isLocalSlugAvailable(slug);
   const { data, error } = await client()
     .from("stores")
     .select("id")
@@ -141,6 +173,7 @@ export async function isSlugAvailable(slug: string): Promise<boolean> {
     .maybeSingle();
   if (error) {
     if (isMissingTableError(error)) return true;
+    if (isSchemaError(error)) return isLocalSlugAvailable(slug);
     throw error;
   }
   return !data;
@@ -151,17 +184,25 @@ export type CreateStoreInput = Omit<StoreRow, "id" | "created_at" | "updated_at"
 };
 
 export async function createStore(input: CreateStoreInput): Promise<StoreRow> {
-  if (!hasServerSupabase()) {
-    const local = makeLocalStore(input);
-    await writeLocalStore(local);
-    return local;
-  }
+  if (!hasServerSupabase()) return createLocalStore(input);
   const { data, error } = await client()
     .from("stores")
     .insert(input)
     .select("*")
     .single();
-  if (error) throw error;
+  if (error) {
+    // If the live schema is missing tables/columns we expect (e.g. PGRST204
+    // "Could not find the 'accent_color' column ... in the schema cache"),
+    // fall back to the cookie-backed local store so onboarding still works.
+    if (isSchemaError(error)) {
+      console.warn(
+        "[stores.createStore] Supabase schema mismatch, falling back to local store:",
+        (error as { message?: string }).message,
+      );
+      return createLocalStore(input);
+    }
+    throw error;
+  }
   return data as StoreRow;
 }
 
@@ -169,26 +210,23 @@ export async function updateStore(
   id: string,
   patch: Partial<StoreRow>,
 ): Promise<StoreRow> {
-  if (!hasServerSupabase()) {
-    const current = await readLocalStore();
-    if (!current || current.id !== id) {
-      throw new Error("Store not found");
-    }
-    const updated: StoreRow = {
-      ...current,
-      ...patch,
-      updated_at: new Date().toISOString(),
-    };
-    await writeLocalStore(updated);
-    return updated;
-  }
+  if (!hasServerSupabase()) return updateLocalStore(id, patch);
   const { data, error } = await client()
     .from("stores")
     .update({ ...patch, updated_at: new Date().toISOString() })
     .eq("id", id)
     .select("*")
     .single();
-  if (error) throw error;
+  if (error) {
+    if (isSchemaError(error)) {
+      console.warn(
+        "[stores.updateStore] Supabase schema mismatch, falling back to local store:",
+        (error as { message?: string }).message,
+      );
+      return updateLocalStore(id, patch);
+    }
+    throw error;
+  }
   return data as StoreRow;
 }
 
