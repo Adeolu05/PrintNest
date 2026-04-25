@@ -97,9 +97,25 @@ export function OnboardingForm({ defaultName = "" }: Props) {
           themeId,
         }),
       });
-      const data = await res.json();
+
+      // Some responses (e.g. unexpected 500s, network proxies, dev-server
+      // hiccups) come back without a JSON body. Read as text first and parse
+      // defensively so we can surface a useful error instead of crashing on
+      // `res.json()`.
+      const raw = await res.text();
+      let data: { error?: string; store?: unknown } = {};
+      if (raw) {
+        try {
+          data = JSON.parse(raw) as typeof data;
+        } catch {
+          data = { error: raw.slice(0, 200) };
+        }
+      }
+
       if (!res.ok) {
-        throw new Error(data.error ?? "Could not create store");
+        throw new Error(
+          data.error ?? `Could not create store (HTTP ${res.status})`,
+        );
       }
       router.push("/dashboard/artworks/new");
     } catch (e: unknown) {
