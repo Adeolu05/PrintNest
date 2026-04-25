@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Logo } from "@/components/brand/Logo";
 import { cn } from "@/lib/utils";
 
 const ITEMS = [
@@ -17,12 +18,9 @@ export function Sidebar() {
   const pathname = usePathname();
   return (
     <aside className="hidden w-56 shrink-0 border-r border-zinc-100 bg-white px-4 py-6 lg:block dark:border-zinc-900 dark:bg-zinc-950">
-      <Link href="/" className="flex items-center gap-2 px-2">
-        <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 text-xs font-bold text-white shadow-sm shadow-blue-500/30">
-          P
-        </span>
-        <span className="text-sm font-semibold tracking-tight">PrintNest</span>
-      </Link>
+      <div className="px-2">
+        <Logo size="md" />
+      </div>
       <nav className="mt-8 space-y-1">
         {ITEMS.map((item) => {
           const active = pathname === item.href || pathname.startsWith(`${item.href}/`);

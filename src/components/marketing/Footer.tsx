@@ -1,17 +1,13 @@
 import Link from "next/link";
+import { Logo } from "@/components/brand/Logo";
 
 export function Footer() {
   return (
     <footer className="border-t border-zinc-100 bg-white dark:border-zinc-900 dark:bg-zinc-950">
       <div className="mx-auto grid w-full max-w-6xl gap-6 px-4 py-10 text-sm text-zinc-600 sm:px-6 md:grid-cols-4">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 text-xs font-bold text-white shadow-sm shadow-blue-500/30">
-              P
-            </span>
-            <span className="text-sm font-semibold">PrintNest</span>
-          </div>
-          <p className="mt-2 max-w-xs text-xs text-zinc-500">
+          <Logo size="md" />
+          <p className="mt-3 max-w-xs text-xs text-zinc-500">
             The fastest way for visual artists to turn artwork into sellable print pages.
           </p>
         </div>
